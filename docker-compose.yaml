@@ -20,7 +20,7 @@ services:
   sonar:
     image: sonarqube:latest  
     ports:
-      - "9000:9000"
+      - "9002:9000"
     volumes:
       - sonar-data:/opt/sonarqube/data
       - sonar-extensions:/opt/sonarqube/extensions
@@ -32,6 +32,25 @@ services:
           memory: 2g
         reservations:
           memory: 2g
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.8
+    container_name: clickhouse
+    ports:
+      - "9000:9000"
+      - "8123:8123"
+    environment:
+      - CLICKHOUSE_DB=default
+      - CLICKHOUSE_USER=default
+      - CLICKHOUSE_PASSWORD=pass
+      - CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT=1
+    volumes:
+      - ./data:/var/lib/clickhouse
+      - ./logs:/var/log/clickhouse-server
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    restart: unless-stopped
 
 volumes:
   redis-data:
@@ -39,3 +58,5 @@ volumes:
   sonar-data:
   sonar-logs:
   sonar-extensions:
+  clickhouse_data:
+  clickhouse_logs:

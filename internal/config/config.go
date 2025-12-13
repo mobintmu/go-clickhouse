@@ -19,6 +19,7 @@ type Config struct {
 	JWTSecret      string
 	JWTExpiryHours int
 	Redis          RedisCfg
+	ClickHouse     ClickHouseCfg
 }
 
 type DatabaseCfg struct {
@@ -30,6 +31,14 @@ type RedisCfg struct {
 	DB         int
 	Prefix     string
 	DefaultTTL int // in minute
+}
+
+type ClickHouseCfg struct {
+	Host     string
+	Port     string
+	DB       string
+	User     string
+	Password string
 }
 
 func NewConfig() (*Config, error) {
@@ -66,6 +75,13 @@ func buildConfig(v *viper.Viper) *Config {
 			DB:         v.GetInt("REDIS_DB"),
 			Prefix:     v.GetString("REDIS_PREFIX"),
 			DefaultTTL: v.GetInt("REDIS_DEFAULT_TTL"),
+		},
+		ClickHouse: ClickHouseCfg{
+			Host:     v.GetString("CLICKHOUSE_HOST"),
+			Port:     v.GetString("CLICKHOUSE_PORT"),
+			DB:       v.GetString("CLICKHOUSE_DB"),
+			User:     v.GetString("CLICKHOUSE_USER"),
+			Password: v.GetString("CLICKHOUSE_PASSWORD"),
 		},
 	}
 }

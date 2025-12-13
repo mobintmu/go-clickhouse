@@ -7,7 +7,9 @@ import (
 	productController "go-clickhouse/internal/product/controller"
 	productService "go-clickhouse/internal/product/service"
 	"go-clickhouse/internal/server"
+	"go-clickhouse/internal/storage"
 	"go-clickhouse/internal/storage/cache"
+	"go-clickhouse/internal/storage/clickhouse"
 	"go-clickhouse/internal/storage/sql"
 	"go-clickhouse/internal/storage/sql/migrate"
 	"go-clickhouse/internal/storage/sql/sqlc"
@@ -21,6 +23,7 @@ func NewApp() *fx.App {
 			logger.NewLogger,
 			config.NewConfig,
 			sql.InitialDB,
+			clickhouse.New,
 			//server
 			health.New,
 			server.NewGinEngine,
@@ -32,6 +35,8 @@ func NewApp() *fx.App {
 			//cache
 			cache.NewClient,
 			cache.NewCacheStore,
+			//Storage
+			storage.New,
 			//controller
 			productController.NewAdmin,
 			productController.NewClient,

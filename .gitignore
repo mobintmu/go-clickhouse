@@ -4,3 +4,5 @@ report.json
 coverage.out
 .env
 .env.production
+logs/*
+data/*
