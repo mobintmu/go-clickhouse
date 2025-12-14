@@ -60,7 +60,7 @@ docker run --name sonarqube \
 
 
 go test -coverpkg=./... -coverprofile=coverage.out ./test
-
+go test -v ./test | grep FAIL
 go test ./... -json > report.json
 
 go tool cover -func=coverage.out
@@ -83,6 +83,9 @@ export SONAR_HOST_URL=http://your-sonarqube-server.com
 export SONAR_TOKEN=your-sonar-token-here
 ```
 
+
+chmod o+x ./data
+chmod o+x ./data/flags
 
 
 ## Run project
@@ -118,5 +121,33 @@ go get -tool google.golang.org/grpc/cmd/protoc-gen-go-grpc
 docker build -t go-clickhouse:latest .
 docker run -p 4000:4000 go-clickhouse:latest
 docker run -p 4000:4000 --env-file .env go-clickhouse:latest
+
+```
+
+
+## clickhouse
+
+```
+curl -X POST "http://localhost:8123" \
+     -u default:pass \
+     --data-binary "CREATE TABLE IF NOT EXISTS products (
+        id Int32,
+        name String,
+        description String,
+        price Int64
+     ) ENGINE = MergeTree()
+     ORDER BY (id)"
+
+curl -X POST "http://localhost:8123" \
+     -u default:pass \
+     --data-binary "INSERT INTO products FORMAT Values
+     (1, 'Laptop', 'High‑performance laptop', 129900),
+     (2, 'Mouse', 'Wireless optical mouse', 2999),
+     (3, 'Keyboard', 'Mechanical keyboard', 8999)"
+
+
+curl -X POST "http://localhost:8123" \
+     -u default:pass \
+     --data-binary "DROP TABLE IF EXISTS products"
 
 ```

@@ -1,25 +1,30 @@
 # Build and run stage
-FROM golang:1.25-alpine
+FROM golang:1.25.3-alpine
 
 WORKDIR /app
 
 # Install dependencies
 RUN apk add --no-cache git ca-certificates
 
-# Copy go mod files
+# Copy go mod files and download dependencies
 COPY go.mod go.sum ./
-
-# Download dependencies
 RUN go mod download
 
-# Copy source code
-COPY . .
+# Copy source code (use .dockerignore to exclude sensitive files)
+# Copy only source code (not the entire directory)
+COPY cmd/ ./cmd/
+COPY docs/ ./docs/
+COPY internal/ ./internal/
 
-# Build the application
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o server cmd/server/main.go
+# Build the application and create non-root user in one layer
+RUN CGO_ENABLED=0 GOOS=linux go build -o server ./cmd/app/main.go && \
+    adduser -D appuser
+
+# Switch to non-root user
+USER appuser
 
 # Expose port
-EXPOSE 4000
+EXPOSE 8080
 
 # Run the application
 CMD ["./server"]

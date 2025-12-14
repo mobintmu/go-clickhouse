@@ -21,6 +21,7 @@ func NewClient(s *service.Product) *ClientProduct {
 func (c *ClientProduct) RegisterRoutes(rg *gin.RouterGroup) {
 	rg.GET("/:id", c.GetProductByID)
 	rg.GET("/", c.ListProducts)
+	rg.GET("/:id/report", c.GetProductWithReport)
 }
 
 // GetProductByID godoc
@@ -62,4 +63,28 @@ func (c *ClientProduct) ListProducts(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, products)
+}
+
+// GetProductWithReport godoc
+// @Summary Get a product with report by ID
+// @Description Get a product along with its report by its ID
+// @Tags Products
+// @Param id path int true "Product ID"
+// @Success 200 {object} dto.ProductResponse
+// @Failure 400 {object} response.ErrorResponse
+// @Failure 500 {object} response.ErrorResponse
+// @Router /api/v1/products/{id}/report [get]
+func (c *ClientProduct) GetProductWithReport(ctx *gin.Context) {
+	var product dto.ProductResponse
+	id, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		response.JSONError(ctx, http.StatusBadRequest, response.ErrInvalidID)
+		return
+	}
+	product, err = c.Service.GetProductWithReport(ctx, int32(id))
+	if err != nil {
+		response.JSONError(ctx, http.StatusInternalServerError, err)
+		return
+	}
+	ctx.JSON(http.StatusOK, product)
 }

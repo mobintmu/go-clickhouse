@@ -20,7 +20,7 @@ services:
   sonar:
     image: sonarqube:latest  
     ports:
-      - "9002:9000"
+      - "9000:9000"
     volumes:
       - sonar-data:/opt/sonarqube/data
       - sonar-extensions:/opt/sonarqube/extensions
@@ -36,7 +36,7 @@ services:
     image: clickhouse/clickhouse-server:24.8
     container_name: clickhouse
     ports:
-      - "9000:9000"
+      - "8990:9000"
       - "8123:8123"
     environment:
       - CLICKHOUSE_DB=default

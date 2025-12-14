@@ -116,3 +116,16 @@ func (s *Product) ListProducts(ctx context.Context) (dto.ClientListProductsRespo
 	s.store.Cache.Set(ctx, s.store.Cache.KeyAllProducts(), resp, s.cfg.Redis.DefaultTTL)
 	return resp, nil
 }
+
+func (s *Product) GetProductWithReport(ctx context.Context, id int32) (dto.ProductResponse, error) {
+	productCH, err := s.store.ClickHouse.Product.SelectProduct(ctx, id)
+	if err != nil {
+		return dto.ProductResponse{}, err
+	}
+	return dto.ProductResponse{
+		ID:          productCH.ID,
+		Name:        productCH.Name,
+		Description: productCH.Description,
+		Price:       productCH.Price,
+	}, nil
+}

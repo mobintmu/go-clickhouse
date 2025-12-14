@@ -4,12 +4,14 @@ import (
 	"context"
 	"fmt"
 	"go-clickhouse/internal/config"
+	"go-clickhouse/internal/storage/clickhouse/product"
 
 	"github.com/ClickHouse/clickhouse-go/v2"
 )
 
 type ClickHouse struct {
-	conn clickhouse.Conn
+	conn    clickhouse.Conn
+	Product *product.Repository
 }
 
 func (c *ClickHouse) Conn() clickhouse.Conn {
@@ -26,14 +28,18 @@ func New(cfg *config.Config) (*ClickHouse, error) {
 		},
 	})
 	if err != nil {
+		fmt.Println("🛑 Click House could not connect: ", err)
 		return nil, err
 	}
 
 	if err := conn.Ping(context.Background()); err != nil {
 		conn.Close()
-		fmt.Println("🛑 Click House could not connect")
+		fmt.Println("🛑 Click House could not connect: ", err)
 		return nil, err
 	}
 
-	return &ClickHouse{conn: conn}, nil
+	return &ClickHouse{
+		conn:    conn,
+		Product: product.NewProductRepository(conn),
+	}, nil
 }
